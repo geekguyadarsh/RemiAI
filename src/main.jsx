@@ -12,6 +12,7 @@ import NotFound from './pages/NotFound.jsx';
 import Homepage from './pages/Homepage.jsx';
 import Login from './pages/Login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import CheckUp from './pages/Chat.jsx';
 
 const router = createBrowserRouter([
   {
@@ -29,39 +30,11 @@ const router = createBrowserRouter([
     element: <Login />,
     errorElement: <Navigate to="/not-found" />,
   },
-
-  // {
-  //   path: '/real-estate',
-  //   element: <RealEstate />,
-  // },
-  // {
-  //   path: '/real-estate-manual',
-  //   element: <RealEstateManual />,
-  // },
-  // {
-  //   path: '/customer-trends',
-  //   element: <CustomerTrends />,
-  // },
-  // {
-  //   path: '/manufacturers',
-  //   element: <Manufacturers />,
-  // },
-  // {
-  //   path: '/admin/dashboard',
-  //   element: (
-  //     <ProtectedRoute>
-  //       <Dashboard />
-  //     </ProtectedRoute>
-  //   ),
-  // },
-  // {
-  //   path: '/admin/login',
-  //   element: <AdminLogin />,
-  // },
-  // {
-  //   path: '/invite/:inviteId',
-  //   element: <InvitePage />,
-  // },
+  {
+    path: '/check-up',
+    element: <CheckUp />,
+    errorElement: <Navigate to="/not-found" />,
+  },
   {
     path: '/not-found',
     element: <NotFound />,

@@ -2,7 +2,10 @@ import React, {useState, useEffect} from 'react';
 import NavBar from '../components/NavBar';
 import DownloadButton from '../components/DownloadButton';
 import AppInput from '../components/Input';
-import { predict } from '../API';
+import { chat, predict } from '../API';
+import Loader from '../components/Loader';
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const symptoms = [
     {"label": "Itching", "value": "itching"},
@@ -146,6 +149,22 @@ const symptoms = [
 const CheckUp = () => {
     const [selected, setSelected] = useState([])
     const [searchTerm, setSearchTerm] = useState('');
+    const [res, setRes] = useState({});
+    const [loading, setLoading] = useState(false)
+    const [textMessage, setTextMessage] = useState("")
+    const [messages, setMessages] = useState(
+        JSON.parse(localStorage.getItem('messages')) || []
+    )
+
+    const getMessages = () => {
+        const chat = localStorage.getItem("messages");
+        setMessages(JSON.parse(chat));
+        // console.log(messages);
+      };
+    
+    useEffect(() => {
+        getMessages();
+    },[]);
 
     const filteredSymptoms = symptoms.filter((symp) =>
     symp.label.toLowerCase().includes(searchTerm.toLowerCase())
@@ -182,77 +201,21 @@ const CheckUp = () => {
    
   }
 
-  const onSubmitMessage = async (textMessage,) => {
-    const existingArray = JSON.parse(localStorage.getItem("messages")) || [];
-    setMessage("");
-    // console.log(imagePrompt);
-
-    const newObject = {
-      id: existingArray.length,
-      response: "",
-      prompt: textMessage,
-      typing: true,
-      isError: false,
-    };
-
-    existingArray.push(newObject);
-    localStorage.setItem("messages", JSON.stringify(existingArray));
-    getMessages();
-
-    const prevResponse = [];
-
-    messages?.forEach((obj) => {
-      if (obj.prompt) {
-        const userObj = { role: "user", content: obj.prompt };
-        prevResponse.push(userObj);
-      }
-
-      if (!obj.isImage && obj.response) {
-        const assistantObj = { role: "assistant", content: obj.response };
-        prevResponse.push(assistantObj);
-      }
-    });
-
-    const reqBody = {
-      chatbot_id: window.PNSPHY_XBOT_CHATBOTID,
-      prompt: textMessage,
-      ray_id: rayID,
-      prev_response: prevResponse,
-    };
-
-    // console.log(reqBody);
+  const predictResult = async () => {
+      setLoading(true);
     try {
-      let res = await API.createHistory(reqBody);
-      // console.log("first", res);
-      const updatedArray = JSON.parse(localStorage.getItem("messages")) || [];
-      const index = updatedArray.findIndex((obj) => obj.id === newObject.id);
-      if (index !== -1) {
-        let response;
-   
-        response = res.response;
-        updatedArray[index].response = response;
-
-        localStorage.setItem("messages", JSON.stringify(updatedArray));
-      }
-    } catch (e) {
-      // console.log(e);
-      const updatedArray = JSON.parse(localStorage.getItem("messages")) || [];
-      const index = updatedArray.findIndex((obj) => obj.id === newObject.id);
-      if (index !== -1) {
-        let response;
-        updatedArray[index].isImage = false;
-
-        response =` ${e}`;
-
-        updatedArray[index].isError = true;
-        updatedArray[index].response = response;
-
-        localStorage.setItem("messages", JSON.stringify(updatedArray));
-      }
+        let res = await predict({"symptoms": selected})
+        setRes(res);
+        let updatedThreads = JSON.parse(localStorage.getItem("threads")) || [];
+        updatedThreads.push(res);
+        localStorage.setItem("threads", JSON.stringify(updatedThreads));
+        
+    } catch (error) {
+        console.log(error)
     }
-    getMessages();
-  };
 
+    setLoading(false);
+  }
 
   return (
     <section className=" bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black min-h-screen">
@@ -298,12 +261,20 @@ const CheckUp = () => {
               ))}
             </div>
         </div>
-        <button className='' onClick={() => predict({"symptoms": selected})}> <span className='bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-5 shadow-md rounded-md p-4'>
-            Predict & Consult AI Doctor
-            </span>
+        <button className='cursor-default'> <button onClick={predictResult} className='bg-gray-400 bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-5 shadow-md rounded-md p-4'>
+            {loading? <Loader/> :"Predict & Consult AI Doctor"}
             </button>
-        <div className="w-1/3 h-[87vh] bg-white bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-5 shadow-md rounded-xl">
-        <AppInput />
+            </button>
+        <div className="w-1/3 h-[87vh] relative bg-white bg-clip-padding backdrop-filter backdrop-blur-lg bg-opacity-5 shadow-md rounded-xl overflow-hidden">
+                {res?.disease && res?.aiResult && 
+                <div className='p-8 max-h-full  overflow-y-scroll noscroll'>
+                 <div className="text-xl font-semibold mb-6">Disease: {`${res?.disease}`}</div>
+                  <div className="text-md">
+                  <Markdown remarkPlugins={[remarkGfm]}>{res?.aiResult}</Markdown>
+                     </div>
+                </div>
+                }
+                {/* <AppInput /> */}
         </div>
     </div>
     </section>

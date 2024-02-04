@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import { CiMenuKebab } from 'react-icons/ci';
 import { FaGithub } from 'react-icons/fa6';
-import PatientDashboardImg from './assets/patientDashboard.svg';
+
 import Grad from './assets/Hero Shape.svg';
 import Graph from './assets/Graph.svg';
 import Gears2 from './assets/Gears2.svg';
@@ -160,7 +160,7 @@ function App() {
           className="absolute z-0 w-screen translate-y-16"
           alt=""
         />
-        <img src={PatientDashboardImg} className="z-10" />
+        <img src={"/ss.png"} className="z-10" />
       </div>
       <div
         className="flex flex-col items-center justify-center mt-44 gap-7"

@@ -155,7 +155,7 @@ function Homepage() {
           className="absolute z-0 w-screen translate-y-16"
           alt=""
         />
-        <img src={PatientDashboardImg} className="z-10" />
+        <img src={'/ss.png'} className="z-10 p-6 rounded-lg" />
       </div>
       <div
         className="flex flex-col items-center justify-center mt-44 gap-7"

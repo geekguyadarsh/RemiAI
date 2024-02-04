@@ -10,8 +10,10 @@ export const predict =async (answers) => {
     try {
     let res = await axios.post(`${API}/predict`, answers)
     console.log("RlllESULT", res)
-   await  chat({message: res.data.prediction})
-    return res.data;
+    let aiRes = await chat({message: res.data.prediction})
+    let finalRes = {disease: res?.data?.prediction, aiResult: aiRes?.response};
+    console.log(finalRes)
+    return finalRes;
 
     } catch (e) {
         console.log(e)

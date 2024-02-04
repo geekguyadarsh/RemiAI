@@ -1,24 +1,37 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import NavBar from '../components/NavBar';
 import DownloadButton from '../components/DownloadButton';
+import { Navigate } from 'react-router-dom';
 
 const Dashboard = () => {
+  const [threads, setThreads] = useState([])
+  const getThreads = () => {
+    const chat = localStorage.getItem("threads");
+    setThreads(JSON.parse(chat));
+    // console.log(messages);
+  };
+
+  useEffect(() => {
+    getThreads();
+  }, []);
+  const navig = () => {
+    return (
+      <Navigate to="/check-up" />
+    )
+  }
   return (
     <section className=" bg-[radial-gradient(ellipse_at_bottom_right,_var(--tw-gradient-stops))] from-gray-700 via-gray-900 to-black min-h-screen">
       <NavBar />
       <div className="flex justify-evenly flex-wrap gap-4 px-auto mx-8 mt-8">
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
-        <Card />
+        {
+          threads.map((thread, i) => <Card key={i} title={thread.disease} />)
+        }
 
-        <Card />
         <div className="h-60 w-72 bg-white rounded-2xl border-none md:mt-0 sm:max-w-md xl:p-0 bg-clip-padding transition-all ease-in-out backdrop-filter backdrop-blur-3xl duration-500 bg-opacity-5 shadow-md hover:shadow-xl scale-100 card">
           <div className="h-full flex justify-center flex-col items-center">
-            <button
+            <a
               title="Add New"
+              href='/check-up'
               className="group cursor-pointer outline-none hover:rotate-90 duration-300"
             >
               <svg
@@ -35,7 +48,7 @@ const Dashboard = () => {
                 <path d="M8 12H16" strokeWidth="1.5"></path>
                 <path d="M12 16V8" strokeWidth="1.5"></path>
               </svg>
-            </button>
+            </a>
             <div className="text-xl font-bold mt-2">Not feeling well?</div>
             <div className="go-corner">
               <div className="go-arrow">+</div>
@@ -47,11 +60,11 @@ const Dashboard = () => {
   );
 };
 
-const Card = () => {
+const Card = ({title}) => {
   return (
     <div className="h-60 w-72 bg-white rounded-2xl border-none md:mt-0 sm:max-w-md xl:p-0 bg-clip-padding transition-all ease-in-out backdrop-filter backdrop-blur-3xl duration-500 bg-opacity-5 shadow-md hover:shadow-xl scale-100 card">
       <div className="w-full h-full flex justify-center items-center flex-col">
-        <p className="card-title">ChickenPox</p>
+        <p className="card-title">{title}</p>
         <p className="small-desc"></p>
         <div className="go-corner">
           <div className="go-arrow">→</div>
